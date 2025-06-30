@@ -1,5 +1,5 @@
 # LitterBot
-Hi! I'm Vedant from Wilcox High School in Santa Clara. 
+Hi! I'm Vedant from Wilcox High School in Santa Clara. This bot is designed to clean pieces of trash from streetsides.
 
 | **Engineer** | **School** | **Interests** | **Grade** |
 |:--:|:--:|:--:|:--:|
