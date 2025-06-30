@@ -17,11 +17,11 @@ JitterBug PCB, Coin Cell Battery, Red LEDs, ERM Vibration Motor, Slide Switch, T
 #### How it works: 
 The circuit is powered by the small coin cell battery in the center. It conducts electricity into a metal battery holder, which powers the vibration motor and LED. A switch in the middle of the jitterbug allows current through the circuit if turned on. There are also some metal wires that act as legs for the jitterbug. 
 
-####Circuit Diagram:
+#### Circuit Diagram:
 ![Jitterbug Diagram](JitterbugCircuitDiagram.png)
 Shown above is the circuit diagram for this starter project. As illustrated, there is a series of parallel connections all powered by the cell battery. 
 
-###Challenges:
+### Challenges:
 The main goal of this project was to practice soldering small wires; the hardest soldering joint was probably the wires of the cell battery, as the joint was miniscule and I risked burning the rubber around the extremely thin wire.
 
 <!-- 
