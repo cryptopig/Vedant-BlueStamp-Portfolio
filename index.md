@@ -27,7 +27,8 @@ The main goal of this project was to practice soldering small wires; the hardest
 
 ### What I learned:
 By viewing and analyzing the circuit diagram, I learned abouut circuit analysis and diagramming. This project was also a great refresher on soldering techniques and safety.
-<!-- 
+
+<!--
 ![Headstone Image](logo.svg)
   
 # Final Milestone
