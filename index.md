@@ -1,8 +1,6 @@
 # LitterBot
 Hi! I'm Vedant from Wilcox High School in Santa Clara. 
 
-![Profile Image](VedantG.svg)
-
 | **Engineer** | **School** | **Interests** | **Grade** |
 |:--:|:--:|:--:|:--:|
 | Vedant G. | Adrian C. Wilcox High School | Mechanical Engineering/Robotics | Incoming Senior
