@@ -1,5 +1,6 @@
 # LitterBot
-Hi! I'm Vedant from Wilcox High School in Santa Clara. This bot is designed to clean pieces of trash from streetsides.
+Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter cleaning robot that's designed to clean trash off the sides of streets. It's built with a Raspberry Pi, various sensors, and uses Computer Vision to detect various litter pieces apart.
+
 
 | **Engineer** | **School** | **Interests** | **Grade** |
 |:--:|:--:|:--:|:--:|
