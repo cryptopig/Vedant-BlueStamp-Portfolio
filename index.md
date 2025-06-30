@@ -25,6 +25,8 @@ Shown above is the circuit diagram for this starter project. As illustrated, the
 ### Challenges:
 The main goal of this project was to practice soldering small wires; the hardest soldering joint was probably the wires of the cell battery, as the joint was miniscule and I risked burning the rubber around the extremely thin wire.
 
+### What I learned:
+By viewing and analyzing the circuit diagram, I learned abouut circuit analysis and diagramming. This project was also a great refresher on soldering techniques and safety.
 <!-- 
 ![Headstone Image](logo.svg)
   
