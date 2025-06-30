@@ -10,7 +10,7 @@ Hi! I'm Vedant from Wilcox High School in Santa Clara.
 
 <iframe width="966" height="543" src="https://www.youtube.com/embed/KB4aGFUIgF0?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Starter Project" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-My first milestone was about my starter projet, the jutterbug. It was good practice for soldeirng, and I didn't face too many challenges with this warm-up activity. I look forward to starting the build plan for my main project, the LitterBot.
+My first milestone was about my starter project, the jitterbug. It was good practice for soldering, and I didn’t face too many challenges with this warm-up activity. I look forward to starting the build plan for my main project, the LitterBot.
 
 <!-- 
 ![Headstone Image](logo.svg)
