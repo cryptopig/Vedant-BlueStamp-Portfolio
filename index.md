@@ -5,7 +5,7 @@ Hi! I'm Vedant from Wilcox High School in Santa Clara.
 |:--:|:--:|:--:|:--:|
 | Vedant G. | Adrian C. Wilcox High School | Mechanical Engineering/Robotics | Incoming Senior
 
-![Profile Picture](VedantG.heic)
+![Profile Picture](VedantG.png)
 
 # Starter Project
 <iframe width="966" height="543" src="https://www.youtube.com/embed/KB4aGFUIgF0?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Starter Project" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
