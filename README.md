@@ -1,1 +1,1 @@
-This repository is a template for documenting BlueStamp Engineering projects. Users should replace this text with a description of what their project is and what their repository holds. 
+Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter cleaning robot that's designed to clean trash off the sides of streets. It's built with a Raspberry Pi, various sensors, and uses Computer Vision to detect various litter pieces apart.
