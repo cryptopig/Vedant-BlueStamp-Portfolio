@@ -1,6 +1,7 @@
 # LitterBot
 Hi! I'm Vedant from Wilcox High School in Santa Clara. 
 
+![Profile Image](VedantG.svg)
 
 | **Engineer** | **School** | **Interests** | **Grade** |
 |:--:|:--:|:--:|:--:|
