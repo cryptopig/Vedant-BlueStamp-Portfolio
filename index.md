@@ -10,8 +10,13 @@ Hi! I'm Vedant from Wilcox High School in Santa Clara.
 <iframe width="966" height="543" src="https://www.youtube.com/embed/KB4aGFUIgF0?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Starter Project" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 My first milestone was about my starter project, the jitterbug. It was good practice for soldering skills. 
-### Parts: 
+#### Parts: 
 JitterBug PCB, Coin Cell Battery, Red LEDs, ERM Vibration Motor, Slide Switch, Tinned Copper Wire
+
+#### How it works: 
+The circuit is powered by the small coin cell battery in the center. It conducts electricity into a metal battery holder, which powers the vibration motor and LED. A switch in the middle of the jitterbug allows current through the circuit if turned on. There are also some metal wires that act as legs for the jitterbug. 
+
+![Jitterbug Diagram](JitterbugCircuitDiagram.png)
 
 <!-- 
 ![Headstone Image](logo.svg)
