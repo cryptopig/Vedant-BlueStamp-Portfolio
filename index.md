@@ -24,17 +24,10 @@ In order to connect to the Arduino, I had to use use a method called Secure Shel
 ![Raspberry Pi Screenshot](rpiinterface)
 For the webcam module, it uses a wire strip to connect to the Raspberry Pi and it communicates using the PiCamera2 Python library as well as the libcamera module. By creating some basic Python code using PiCamera2, I was able to capture photos such as the one below:
 ![PICamera Photo](picam.png)
-
-
-#### Circuit Diagram:
-![Jitterbug Diagram](JitterbugCircuitDiagram.png)
-Shown above is the circuit diagram for this starter project. As illustrated, there is a series of parallel connections all powered by the cell battery. 
+I also made my own case for the RPi's Webcam and 3D printed it to ensure easy mounting later on. 
 
 ### Challenges:
-The main goal of this project was to practice soldering small wires; the hardest soldering joint was probably the wires of the cell battery, as the joint was miniscule and I risked burning the rubber around the extremely thin wire.
-
-### What I learned:
-By viewing and analyzing the circuit diagram, I learned abouut circuit analysis and diagramming. This project was also a great refresher on soldering techniques and safety.
+The main challenge with the setup process for the Raspberry Pi setup was setting up the network connections and ensuring SSH/VNC worked well. 
 
 
 <!-- ##################################################################################### -->
