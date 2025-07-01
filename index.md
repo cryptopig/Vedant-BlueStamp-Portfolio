@@ -9,7 +9,7 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
 ![Profile Picture](VedantG.png)
 
 # Milestone 1
-<iframe width="966" height="543" src="https://www.youtube.com/embed/KB4aGFUIgF0?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Starter Project" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="966" height="543" src="https://www.youtube.com/embed/7jXYeCsxyJg?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 My first milestone was setting up the Raspberry Pi as well as the web camera inferface for OpenCV. Since it was my first time setting up a Raspberry Pi, it was challenging; however, the RPi documentation was very helpful. The most difficult part of the process was likely setting up SSH and ensuring that it works in VS Code. I had the advantage of working with a Mac, which has SSH installed by default (whereas it would have been more complicated on Windows). Howevever, port #22 was blocked on the wifi I was connected to, so I had to fiddle with the settings and change the port to 17872 instead, and I also had to sort out some difficulties with the hostname not resolving. It was definitely satifsfying getting the Raspberry Pi to function, and I look especially look forward to using OpenCV. It was also nice that the webcam worked right off the bat, so I could write a short testing program and take a few pictures with the webcam.
 
