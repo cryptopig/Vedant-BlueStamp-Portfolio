@@ -7,6 +7,22 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
 | Vedant G. | Adrian C. Wilcox High School | Mechanical Engineering/Robotics | Incoming Senior
 
 ![Profile Picture](VedantG.png)
+# Milestone 2
+<iframe width="966" height="543" src="https://www.youtube.com/embed/tVyszGtNbkA?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+My second milestone was assembling the full base chassis for the ball tracking robot and getting all the sensors to work in software. Before this point, I'd only programmed Arduino microcontrollers and not Raspberry Pi's. However, since the Pi supports Python, I was able to write code without having too much difficulty with syntax. However, it was challenging debugging the code when it didn't work, especially the camera code. Furthermore, I had to debug issues with my ultrasonic sensor and discovered that my voltage divider circuit was incorrect, so fixing this sensor was another minor challenge. The main challenge was probably wire management, as organizing dozens of jumper cables a well as delecately-soldered wires on the motors is inherently difficult. However, I plan to use 3D-printed wire-management sleeves/routes to organize the wires during my modification milestones, when I move all the parts from the base chassis to my custom bot chassis. I also look forward to finishing my OpenCV pipeline so the robot is able to detect the red ball.
+
+#### Parts Used:
+Raspberry Pi 4, TT motors, rubber wheels, chassis, breadboard, ultrasonic sensor, Arducam web camera, L298 motor driver
+
+#### Software/Tools Used:
+VSCode, Tiger VNCViewer, VSCode (SSH), RPi OS (Linux)
+
+#### How it Works:
+In order to properly connect everything to the Raspberry Pi, I made sure to write down my pin mapping for GPIO pins and their respective ports. Unlike the Arduinos I was used to working with, many GPIO pins had alternate purposes, were unlabelled, and also featured multiple 5V and GND pins. Thus, I had to be careful with my connections to ensure I was using the right pins for the right purposes. The webcam uses a wire strip that's connected to the camera port on the RPi, which makes it easy to interface with. I was also used to not requiring a voltage divider to connect the ultrasonic sensor, since the Arduino UNO board that I use can handle 5V power. However, I needed to learn about voltage dividers and create the simple circuit to supply the proper voltage to the ultrasonic sensor (3K ohm resistance to drop 5V down to 3.3V). 
+
+#### Challenges:
+The main challenges during this stage were wire management and getting the webcamera and OpenCV to work properly. 
 
 # Milestone 1
 <iframe width="966" height="543" src="https://www.youtube.com/embed/7jXYeCsxyJg?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -20,7 +36,7 @@ Raspberry Pi 4, Arducam Web Camera
 Raspberry Pi Imager, VS Code, RPi OS (Linux), SSH (through VS Code), VNC (Through Tiger VNCViewer)
 ![Terminal Screenshot](shellscreenshot.png)
 #### How it works: 
-In order to connect to the Arduino, I had to use use a method called Secure Shell, or SSH. Both the Raspberry Pi and my laptop have their own IP addresses, ports, and MAC addresses. When the computer initiates a request to connect to the Raspberry Pi on port 17872, the computer and RPi negotiate a secure, encrypted connection.
+In order to connect to the Raspberry Pi, I had to use use a method called Secure Shell, or SSH. Both the Raspberry Pi and my laptop have their own IP addresses, ports, and MAC addresses. When the computer initiates a request to connect to the Raspberry Pi on port 17872, the computer and RPi negotiate a secure, encrypted connection.
 ![Raspberry Pi Screenshot](rpiinterface)
 For the webcam module, it uses a wire strip to connect to the Raspberry Pi and it communicates using the PiCamera2 Python library as well as the libcamera module. By creating some basic Python code using PiCamera2, I was able to capture photos such as the one below:
 ![PICamera Photo](picam.png)
