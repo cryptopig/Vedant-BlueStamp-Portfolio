@@ -6,7 +6,8 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
 |:--:|:--:|:--:|:--:|
 | Vedant G. | Adrian C. Wilcox High School | Mechanical Engineering/Robotics | Incoming Senior
 
-![Profile Picture](VedantG.png)
+<img src="VedantG.png" alt="Profile Picture" width="300" height="200">
+
 # Milestone 2
 <iframe width="966" height="543" src="https://www.youtube.com/embed/tVyszGtNbkA?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
