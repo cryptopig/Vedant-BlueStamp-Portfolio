@@ -1,4 +1,4 @@
-# LitterBot
+# Ball Tracking Robot
 Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter cleaning robot that's designed to clean trash off the sides of streets. It's built with a Raspberry Pi, various sensors, and uses Computer Vision to detect various litter pieces apart.
 
 
