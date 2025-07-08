@@ -25,7 +25,7 @@ VSCode, Tiger VNCViewer, VSCode (SSH), RPi OS (Linux)
 In order to properly connect everything to the Raspberry Pi, I made sure to write down my pin mapping for GPIO pins and their respective ports. Unlike the Arduinos I was used to working with, many GPIO pins had alternate purposes, were unlabelled, and also featured multiple 5V and GND pins. Thus, I had to be careful with my connections to ensure I was using the right pins for the right purposes. The webcam uses a wire strip that's connected to the camera port on the RPi, which makes it easy to interface with. I was also used to not requiring a voltage divider to connect the ultrasonic sensor, since the Arduino UNO board that I use can handle 5V power. However, I needed to learn about voltage dividers and create the simple circuit to supply the proper voltage to the ultrasonic sensor (3K ohm resistance to drop 5V down to 3.3V). 
 
 #### Challenges:
-The main challenges during this stage were wire management and getting the webcamera and OpenCV to work properly. 
+The main challenges during this stage were getting OpenCV to work properly and recognize the ball. Furthermore, wire management was also difficult. Before this point, I had only worked with much simpler OpenCV models, and performance optimization was not too much of a worry. However, with the limited processing power of a Raspberry Pi, I needed to ensure my code was extremely clean and optimized, which is especially hard in Python when compared to another language such as C++. However, I used Gaussian blur masks as well as limiting FPS in the browser preview of the video to ensure that the video stream was not very delayed. Furthermore, it was difficult to draw a bounding shape around the red ball; meaning that the program would dynamically adjust the size and shape of the bounding box it drew. I poured through tons of documentation online until I was able to get this working.
 
 # Milestone 1
 <iframe width="966" height="543" src="https://www.youtube.com/embed/7jXYeCsxyJg?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -46,7 +46,7 @@ For the webcam module, it uses a wire strip to connect to the Raspberry Pi and i
 I also made my own case for the RPi's Webcam and 3D printed it to ensure easy mounting later on. 
 
 ### Challenges:
-The main challenge with the setup process for the Raspberry Pi setup was setting up the network connections and ensuring SSH/VNC worked well. 
+The main challenge with the setup process for the Raspberry Pi setup was setting up the network connections and ensuring SSH/VNC worked well. The initial set-up of a new wi-fi connection is a bit tedious, especially on a headless setup where I need to use OBS to create a new video capture device and view the Raspberry Pi from there, as well as control it with external peripherals. However, tools like TigerVNC Viewer made this process much easier after the intial connection to wi-fi, as I could simply use my built-in mouse and keyboard and view the Raspberry Pi on my laptop itself. SSH was a bit challenging to set up with VSCode initially, but the VS Code extensions made it much simpler to interface with.
 
 
 <!-- ##################################################################################### -->
@@ -66,7 +66,7 @@ The circuit is powered by the small coin cell battery in the center. It conducts
 Shown above is the circuit diagram for this starter project. As illustrated, there is a series of parallel connections all powered by the cell battery. 
 
 ### Challenges:
-The main goal of this project was to practice soldering small wires; the hardest soldering joint was probably the wires of the cell battery, as the joint was miniscule and I risked burning the rubber around the extremely thin wire.
+The main goal of this project was to practice soldering small wires; the hardest soldering joint was probably the wires of the cell battery, as the joint was miniscule and I risked burning the rubber around the extremely thin wire. 
 
 ### What I learned:
 By viewing and analyzing the circuit diagram, I learned abouut circuit analysis and diagramming. This project was also a great refresher on soldering techniques and safety.
