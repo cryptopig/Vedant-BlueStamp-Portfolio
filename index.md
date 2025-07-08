@@ -13,6 +13,8 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
 
 My second milestone was assembling the full base chassis for the ball tracking robot and getting all the sensors to work in software. Before this point, I'd only programmed Arduino microcontrollers and not Raspberry Pi's. However, since the Pi supports Python, I was able to write code without having too much difficulty with syntax. However, it was challenging debugging the code when it didn't work, especially the camera code. Furthermore, I had to debug issues with my ultrasonic sensor and discovered that my voltage divider circuit was incorrect, so fixing this sensor was another minor challenge. The main challenge was probably wire management, as organizing dozens of jumper cables a well as delecately-soldered wires on the motors is inherently difficult. However, I plan to use 3D-printed wire-management sleeves/routes to organize the wires during my modification milestones, when I move all the parts from the base chassis to my custom bot chassis. I also look forward to finishing my OpenCV pipeline so the robot is able to detect the red ball.
 
+![Terminal Screenshot](redballCV.jpg)
+
 #### Parts Used:
 Raspberry Pi 4, TT motors, rubber wheels, chassis, breadboard, ultrasonic sensor, Arducam web camera, L298 motor driver
 
