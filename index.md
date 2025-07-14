@@ -7,14 +7,53 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
 | Vedant G. | Adrian C. Wilcox High School | Mechanical Engineering/Robotics | Incoming Senior
 
 <img src="VedantG.png" alt="Profile Picture" width="300" height="400">
+# Milestone 3
+<iframe width="966" height="543" src="https://www.youtube.com/embed/zQjKnPrG0UA?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+My third milestone was probably the most challenging up to this point; it was to finish the actual software for the bot and get it to track the ball on-screen with OpenCV and translate that into actual movement on the bot. However, I was motivated to finish since I was looking forward to working on my modifications, which are the bulk of my project. Since I had some previous experience with OpenCV and already had some boilerplate code from Milestone 2, it made the process a bit easier. However, I had to fine-tunbe tons of different variables and optimize many features to get the bot to track the ball real-time instead of slightly delayed. I also had some debugging to do for the motor wiring (since I did not label my motor wires); for the future moving of all the parts to the tank chassis, I will ensure that I label and organize my wires to expedite this process. 
+
+#### Software/Tools Used:
+VSCode, Tiger VNCViewer, VSCode (SSH), RPi OS (Linux)
+
+#### How it Works:
+  The OpenCV pipeline works by recognizing an object primarily based on color; in this case, a red colored ball. I originally had a pipeline that also detected the shape of the ball, but it made the bot lag slighlty and therefore turning was delayed, which caused all sorts of errors in movement. When the program detects a red object, it draws a bounding box around the object at the x and y coordinates of the object, where the bottom left corner of the box is the origin point. Since my bot needs to track the center of the ball and not the corner, I did some simple arithmetic: `(x + width) / 2` for the x-coordinate, and `(y + height) / 2`, where x is the origin point's x and y is the origin point's y. I stored these coordinates in a variable called `ball_pos`, which was updated every 24 frames (a value I precisely tuned in order to get the bot to move in real-time without much lag). Based on this, I calculated the offset of the ball from the center line (which was just the width of the entire window / 2). The offset from the center line is stored in a variable called `delta`; if delta is negative, the ball is a bit to the left of the center. If it is positive, the ball is too much to the right. The bot turns left or right to center the ball within 50 pixels of the center line. Once the ball is centered, the bot moves forward until the ultrasonic sensor detects the ball and the bot stops. 
+  To organize the code, I've stored all motor-related code in it's own file, `motorcode.py`, and just import everything from that file into every other python file I need to use motors in. This way, whenever I change a motor's port or want to adjust it's speed, I can simply update one file to update everything else. 
+
+#### Challenges:
+  Throughout this process, I faced lots of difficult challenges, mostly with getting the OpenCV pipeline to work correctly and tuning the bot's movement. The first problem I faced was with running multiple loops at the same time; in order to increase efficiency, I wanted to run a loop for motor control and OpenCV at the same time; however, the async library that I was using was too slow and caused delays. I switched to another implementation:
+
+`if __name__ == '__main__':
+    t1 = threading.Thread(target=camera_loop)
+    t1.daemon = True
+    t1.start()
+   t2 = threading.Thread(target=control_loop)
+    t2.daemon = True
+    t2.start()`
+With this implentation, I could use multithreading to run multiple while loops at the same time with Daemon instead, which is built into Python and worked much better. However, the loop was still too slow. I decided to look into adjusting the FPS; I intentionally delayed the loop by 0.024 seconds, which translated to 24 FPS; a number based on tons of trial-and-error tuning. I also used a Gaussian blur and mask in order to erode the quality of the image and make the model faster. My other main challenge was that the bot was overturning; wen it detected that the ball was off-centered, it would turn left or right. However, it would turn so quickly that the ball would leave the frame, and it would get stuck in a loop of turning in circles. To fix this, I implemented motor PWM control to properly control motor speed:
+`def init():
+    global left_pwm, right_pwm
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup([IN1, IN2, IN3, IN4], GPIO.OUT)
+    if left_pwm is None:
+        left_pwm = PWMOutputDevice(ENA)
+    if right_pwm is None:
+        right_pwm = PWMOutputDevice(ENB)
+    left_pwm.value = 1.0
+    right_pwm.value = 1.0
+# sets the motor speed based on a float value from 0.0-1.0
+def set_speed(left=1.0, right=1.0):
+    left_pwm.value = left
+    right_pwm.value = right`
+This process was a bit challenging to figure out, as I hadn't used motor PWM directly before this point. However, this solution worked and the bot turned much slower, and it could efficently track the ball. 
 
 # Milestone 2
 <iframe width="966" height="543" src="https://www.youtube.com/embed/tVyszGtNbkA?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-My second milestone was assembling the full base chassis for the ball tracking robot and getting all the sensors to work in software. Before this point, I'd only programmed Arduino microcontrollers and not Raspberry Pi's. However, since the Pi supports Python, I was able to write code without having too much difficulty with syntax. However, it was challenging debugging the code when it didn't work, especially the camera code. Furthermore, I had to debug issues with my ultrasonic sensor and discovered that my voltage divider circuit was incorrect, so fixing this sensor was another minor challenge. The main challenge was probably wire management, as organizing dozens of jumper cables a well as delecately-soldered wires on the motors is inherently difficult. However, I plan to use 3D-printed wire-management sleeves/routes to organize the wires during my modification milestones, when I move all the parts from the base chassis to my custom bot chassis. I also look forward to finishing my OpenCV pipeline so the robot is able to detect the red ball. Unfortunately, I still need to do some tuning to the model, since it is not as accurate as I would need just yet (as shown in the image).
+  My second milestone was assembling the full base chassis for the ball tracking robot and getting all the sensors to work in software. Before this point, I'd only programmed Arduino microcontrollers and not Raspberry Pi's. However, since the Pi supports Python, I was able to write code without having too much difficulty with syntax. However, it was challenging debugging the code when it didn't work, especially the camera code. Furthermore, I had to debug issues with my ultrasonic sensor and discovered that my voltage divider circuit was incorrect, so fixing this sensor was another minor challenge. The main challenge was probably wire management, as organizing dozens of jumper cables a well as delecately-soldered wires on the motors is inherently difficult. However, I plan to use 3D-printed wire-management sleeves/routes to organize the wires during my modification milestones, when I move all the parts from the base chassis to my custom bot chassis. I also look forward to finishing my OpenCV pipeline so the robot is able to detect the red ball. Unfortunately, I still need to do some tuning to the model, since it is not as accurate as I would need just yet (as shown in the image). I also plan to expand the space on the tank chassis through 3D-printed platforms, as space on this current ball-tracking chassis was compressed and I had to carefully balance the weight.
 
-![Terminal Screenshot](redballCV.jpg)
-
+![Red Ball CV](redballCV.jpg)
+<em>An image of the OpenCV model working in real-time. The size of the circle adjusts to the size of the red ball.</em>
 #### Parts Used:
 Raspberry Pi 4, TT motors, rubber wheels, chassis, breadboard, ultrasonic sensor, Arducam web camera, L298 motor driver
 
@@ -22,15 +61,15 @@ Raspberry Pi 4, TT motors, rubber wheels, chassis, breadboard, ultrasonic sensor
 VSCode, Tiger VNCViewer, VSCode (SSH), RPi OS (Linux)
 
 #### How it Works:
-In order to properly connect everything to the Raspberry Pi, I made sure to write down my pin mapping for GPIO pins and their respective ports. Unlike the Arduinos I was used to working with, many GPIO pins had alternate purposes, were unlabelled, and also featured multiple 5V and GND pins. Thus, I had to be careful with my connections to ensure I was using the right pins for the right purposes. The webcam uses a wire strip that's connected to the camera port on the RPi, which makes it easy to interface with. I was also used to not requiring a voltage divider to connect the ultrasonic sensor, since the Arduino UNO board that I use can handle 5V power. However, I needed to learn about voltage dividers and create the simple circuit to supply the proper voltage to the ultrasonic sensor (3K ohm resistance to drop 5V down to 3.3V). 
+  In order to properly connect everything to the Raspberry Pi, I made sure to write down my pin mapping for GPIO pins and their respective ports. Unlike the Arduinos I was used to working with, many GPIO pins had alternate purposes, were unlabelled, and also featured multiple 5V and GND pins. Thus, I had to be careful with my connections to ensure I was using the right pins for the right purposes. The webcam uses a wire strip that's connected to the camera port on the RPi, which makes it easy to interface with. I was also used to not requiring a voltage divider to connect the ultrasonic sensor, since the Arduino UNO board that I use can handle 5V power. However, I needed to learn about voltage dividers and create the simple circuit to supply the proper voltage to the ultrasonic sensor (3K ohm resistance to drop 5V down to 3.3V). 
 
 #### Challenges:
-The main challenges during this stage were getting OpenCV to work properly and recognize the ball. Furthermore, wire management was also difficult. Before this point, I had only worked with much simpler OpenCV models, and performance optimization was not too much of a worry. However, with the limited processing power of a Raspberry Pi, I needed to ensure my code was extremely clean and optimized, which is especially hard in Python when compared to another language such as C++. However, I used Gaussian blur masks as well as limiting FPS in the browser preview of the video to ensure that the video stream was not very delayed. Furthermore, it was difficult to draw a bounding shape around the red ball; meaning that the program would dynamically adjust the size and shape of the bounding box to fit the red ball. I poured through tons of documentation online until I was able to get this working. This feature can be seen in the above image, where the smaller "red ball" it recognizes has a dynamically shaped bounding box drawn around it, and the larger red ball has a larger circle fitting it.
+  The main challenges during this stage were getting OpenCV to work properly and recognize the ball. Furthermore, wire management was also difficult. Before this point, I had only worked with much simpler OpenCV models, and performance optimization was not too much of a worry. However, with the limited processing power of a Raspberry Pi, I needed to ensure my code was extremely clean and optimized, which is especially hard in Python when compared to another language such as C++. However, I used Gaussian blur masks as well as limiting FPS in the browser preview of the video to ensure that the video stream was not very delayed. Furthermore, it was difficult to draw a bounding shape around the red ball; meaning that the program would dynamically adjust the size and shape of the bounding box to fit the red ball. I poured through tons of documentation online until I was able to get this working. This feature can be seen in the above image, where the smaller "red ball" it recognizes has a dynamically shaped bounding box drawn around it, and the larger red ball has a larger circle fitting it.
 
 # Milestone 1
 <iframe width="966" height="543" src="https://www.youtube.com/embed/7jXYeCsxyJg?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-My first milestone was setting up the Raspberry Pi as well as the web camera inferface for OpenCV. Since it was my first time setting up a Raspberry Pi, it was challenging; however, the RPi documentation was very helpful. The most difficult part of the process was likely setting up SSH and ensuring that it works in VS Code. I had the advantage of working with a Mac, which has SSH installed by default (whereas it would have been more complicated on Windows). Howevever, port #22 was blocked on the wifi I was connected to, so I had to fiddle with the settings and change the port to 17872 instead, and I also had to sort out some difficulties with the hostname not resolving. It was definitely satifsfying getting the Raspberry Pi to function, and I look especially look forward to using OpenCV. It was also nice that the webcam worked right off the bat, so I could write a short testing program and take a few pictures with the webcam.
+  My first milestone was setting up the Raspberry Pi as well as the web camera inferface for OpenCV. Since it was my first time setting up a Raspberry Pi, it was challenging; however, the RPi documentation was very helpful. The most difficult part of the process was likely setting up SSH and ensuring that it works in VS Code. I had the advantage of working with a Mac, which has SSH installed by default (whereas it would have been more complicated on Windows). Howevever, port #22 was blocked on the wifi I was connected to, so I had to fiddle with the settings and change the port to 17872 instead, and I also had to sort out some difficulties with the hostname not resolving. It was definitely satifsfying getting the Raspberry Pi to function, and I look especially look forward to using OpenCV. It was also nice that the webcam worked right off the bat, so I could write a short testing program and take a few pictures with the webcam.
 
 #### Parts: 
 Raspberry Pi 4, Arducam Web Camera
@@ -46,7 +85,7 @@ For the webcam module, it uses a wire strip to connect to the Raspberry Pi and i
 I also made my own case for the RPi's Webcam and 3D printed it to ensure easy mounting later on. 
 
 ### Challenges:
-The main challenge with the setup process for the Raspberry Pi setup was setting up the network connections and ensuring SSH/VNC worked well. The initial set-up of a new wi-fi connection is a bit tedious, especially on a headless setup where I need to use OBS to create a new video capture device and view the Raspberry Pi from there, as well as control it with external peripherals. However, tools like TigerVNC Viewer made this process much easier after the intial connection to wi-fi, as I could simply use my built-in mouse and keyboard and view the Raspberry Pi on my laptop itself. SSH was a bit challenging to set up with VSCode initially, but the VS Code extensions made it much simpler to interface with.
+  The main challenge with the setup process for the Raspberry Pi setup was setting up the network connections and ensuring SSH/VNC worked well. The initial set-up of a new wi-fi connection is a bit tedious, especially on a headless setup where I need to use OBS to create a new video capture device and view the Raspberry Pi from there, as well as control it with external peripherals. However, tools like TigerVNC Viewer made this process much easier after the intial connection to wi-fi, as I could simply use my built-in mouse and keyboard and view the Raspberry Pi on my laptop itself. SSH was a bit challenging to set up with VSCode initially, but the VS Code extensions made it much simpler to interface with.
 
 
 <!-- ##################################################################################### -->
@@ -59,17 +98,17 @@ My starter project was about my starter project, the jitterbug. It was good prac
 JitterBug PCB, Coin Cell Battery, Red LEDs, ERM Vibration Motor, Slide Switch, Tinned Copper Wire
 
 #### How it works: 
-The circuit is powered by the small coin cell battery in the center. It conducts electricity into a metal battery holder, which powers the vibration motor and LED. A switch in the middle of the jitterbug allows current through the circuit if turned on. There are also some metal wires that act as legs for the jitterbug. 
+  The circuit is powered by the small coin cell battery in the center. It conducts electricity into a metal battery holder, which powers the vibration motor and LED. A switch in the middle of the jitterbug allows current through the circuit if turned on. There are also some metal wires that act as legs for the jitterbug. 
 
 #### Circuit Diagram:
 ![Jitterbug Diagram](JitterbugCircuitDiagram.png)
-Shown above is the circuit diagram for this starter project. As illustrated, there is a series of parallel connections all powered by the cell battery. 
+  Shown above is the circuit diagram for this starter project. As illustrated, there is a series of parallel connections all powered by the cell battery. 
 
 ### Challenges:
-The main goal of this project was to practice soldering small wires; the hardest soldering joint was probably the wires of the cell battery, as the joint was miniscule and I risked burning the rubber around the extremely thin wire. 
+  The main goal of this project was to practice soldering small wires; the hardest soldering joint was probably the wires of the cell battery, as the joint was miniscule and I risked burning the rubber around the extremely thin wire. 
 
 ### What I learned:
-By viewing and analyzing the circuit diagram, I learned abouut circuit analysis and diagramming. This project was also a great refresher on soldering techniques and safety.
+  By viewing and analyzing the circuit diagram, I learned abouut circuit analysis and diagramming. This project was also a great refresher on soldering techniques and safety.
 
 <!--
 ![Headstone Image](logo.svg)
