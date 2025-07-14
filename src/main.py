@@ -12,7 +12,6 @@ app = Flask(__name__)
 sensor = DistanceSensor(echo=26, trigger=19)
 
 FPS = 24  # frames per second
-ball_pos = [0, 0]
 
 # tuned this value; the camera is offset to the right of the bot, so I needed to correct
 # for this offset in code. Tuned this value based on trial-and-error.
@@ -31,41 +30,51 @@ frame_lock = threading.Lock()
 # motor pins are already specified in imported functions; don't need to be used directly here
 
 # main detection function
-def detect_red_ball(frame):
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV) # sets color mode 
+import cv2
 
-# color bounds set here
-    lower_red1 = np.array([0, 180, 130])
-    upper_red1 = np.array([10, 255, 255])
-    lower_red2 = np.array([170, 180, 130])
-    upper_red2 = np.array([180, 255, 255])
+net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt', 'MobileNetSSD_deploy.caffemodel')
+# imports some arbitrar objects from the predownloaded model 
+classes = ["background", "aeroplane", "bicycle", "bird", "boat",
+           "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+           "dog", "horse", "motorbike", "person", "pottedplant",
+           "sheep", "sofa", "train", "tvmonitor"]
 
-    mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
-    mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
-    mask = cv2.bitwise_or(mask1, mask2)
+trash_classes = {"bottle"}  # You can expand this as needed
+detected_trash_center = [0, 0]
 
-    mask = cv2.GaussianBlur(mask, (9, 9), 2)
-    mask = cv2.erode(mask, None, iterations=1)
-    mask = cv2.dilate(mask, None, iterations=1)
+# main deetction function
+def detect_trash(frame):
+    global detected_trash_center
+    h, w = frame.shape[:2]
+    
+    # small resolution to increase performance (probably will run ~8 FPS)
+    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
+                                 0.007843, (300, 300), 127.5)
+    net.setInput(blob)
+    detections = net.forward()
 
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
- #contour area for bounding box 
-    for contour in contours:
-        area = cv2.contourArea(contour)
-        if area < 300:
-            continue
+    detected_trash_center = [0, 0]  # Reset every frame
 
-        x, y, w, h = cv2.boundingRect(contour)
-        if not 0.8 < float(w) / h < 1.2:
-            continue
+    for i in range(detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+        if confidence > 0.5:
+            idx = int(detections[0, 0, i, 1])
+            label = classes[idx]
+            if label in trash_classes:
+                box = detections[0, 0, i, 3:7] * [w, h, w, h]
+                (startX, startY, endX, endY) = box.astype("int")
+                centerX = (startX + endX) // 2
+                centerY = (startY + endY) // 2
 
-        # rdraw bounding box around the red ball
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        ball_pos[0] = (x + w)/2 # gets center of the ball instead of bottom/sides
-        ball_pos[1] = (y + h)/2 # gets center of the ball like above
-        break  # only detect one ball
+                cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+                cv2.putText(frame, f"{label}: {confidence:.2f}", (startX, startY - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+                detected_trash_center = [centerX, centerY]
+                break  # Only track the first detected trash item
 
     return frame
+
 
 # main camera loop; cycles through frames specified by FPS variable and detects whether the
 # red ball is in frame
@@ -74,7 +83,7 @@ def camera_loop():
     while True:
         frame = picam2.capture_array()
         frame = cv2.rotate(frame, cv2.ROTATE_180)
-        frame = detect_red_ball(frame)
+        frame = detect_trash(frame)
 
         with frame_lock:
             output_frame = frame
@@ -98,17 +107,17 @@ def control_loop():
 
 # all movement functios are imported from motorcode so they don't need to be specified
 def track_center(frame_width=640, threshold=50, distance = 0.075):
-    global ball_pos
+    global detected_trash_center
     set_speed(0.65,0.65)
 
 
-    if ball_pos[0] == 0:
+    if detected_trash_center[0] == 0:
         print("Ball not detected.")
         stop()
         return
 
     frame_center = (frame_width // 2) - CAMERA_OFFSET
-    delta = ball_pos[0] - frame_center
+    delta = detected_trash_center[0] - frame_center
 
     # print(f"Ball X: {ball_pos[0]}, Center: {frame_center}, Delta: {delta}")
 
@@ -121,18 +130,18 @@ def track_center(frame_width=640, threshold=50, distance = 0.075):
     # forward
     if abs(delta) <= threshold:
         move_forward()
-        print(f"Ball X: {ball_pos[0]}, Center: {frame_center}, Delta: {delta}; FORWARD\nDistance: {sensor.distance}")
+        print(f"Ball X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; FORWARD\nDistance: {sensor.distance}")
 
     # left turn
     elif delta < -threshold:
         turn_left()
-        print(f"Ball X: {ball_pos[0]}, Center: {frame_center}, Delta: {delta}; LEFT\nDistance: {sensor.distance}")
+        print(f"Ball X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; LEFT\nDistance: {sensor.distance}")
         
     
     # right turn
     elif delta > threshold:
         turn_right()
-        print(f"Ball X: {ball_pos[0]}, Center: {frame_center}, Delta: {delta}; RIGHT\nDistance: {sensor.distance}")
+        print(f"Ball X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; RIGHT\nDistance: {sensor.distance}")
 
 @app.route('/')
 def video_feed():
