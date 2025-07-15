@@ -1,5 +1,5 @@
 # Ball Tracking Robot
-Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter cleaning robot that's designed to clean trash off the sides of streets. It's built with a Raspberry Pi, various sensors, and uses Computer Vision to detect various litter pieces apart.
+Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter cleaning robot that's designed to clean trash off the sides of streets. It's built with a Raspberry Pi, an ultrasonic sensor, webcam, IMU module, and uses Computer Vision to detect various litter pieces apart.
 
 
 | **Engineer** | **School** | **Interests** | **Grade** |
@@ -53,7 +53,7 @@ This process was a bit challenging to figure out, as I hadn't used motor PWM dir
 
   My second milestone was assembling the full base chassis for the ball tracking robot and getting all the sensors to work in software. Before this point, I'd only programmed Arduino microcontrollers and not Raspberry Pi's. However, since the Pi supports Python, I was able to write code without having too much difficulty with syntax. However, it was challenging debugging the code when it didn't work, especially the camera code. Furthermore, I had to debug issues with my ultrasonic sensor and discovered that my voltage divider circuit was incorrect, so fixing this sensor was another minor challenge. The main challenge was probably wire management, as organizing dozens of jumper cables a well as delecately-soldered wires on the motors is inherently difficult. However, I plan to use 3D-printed wire-management sleeves/routes to organize the wires during my modification milestones, when I move all the parts from the base chassis to my custom bot chassis. I also look forward to finishing my OpenCV pipeline so the robot is able to detect the red ball. Unfortunately, I still need to do some tuning to the model, since it is not as accurate as I would need just yet (as shown in the image). I also plan to expand the space on the tank chassis through 3D-printed platforms, as space on this current ball-tracking chassis was compressed and I had to carefully balance the weight.
 
-![Red Ball CV](redballCV.jpg)
+![Red Ball CV](redballCV.jpg) <br>
 <em>An image of the OpenCV model working in real-time. The size of the circle adjusts to the size of the red ball.</em>
 #### Parts Used:
 Raspberry Pi 4, TT motors, rubber wheels, chassis, breadboard, ultrasonic sensor, Arducam web camera, L298 motor driver
@@ -77,12 +77,16 @@ Raspberry Pi 4, Arducam Web Camera
 
 #### Software/Tools Used: 
 Raspberry Pi Imager, VS Code, RPi OS (Linux), SSH (through VS Code), VNC (Through Tiger VNCViewer)
-![Terminal Screenshot](shellscreenshot.png)
+![Terminal Screenshot](shellscreenshot.png) <br>
+<em>A picture of the command-line output of the Pi.</em>
+
 #### How it works: 
 In order to connect to the Raspberry Pi, I had to use use a method called Secure Shell, or SSH. Both the Raspberry Pi and my laptop have their own IP addresses, ports, and MAC addresses. When the computer initiates a request to connect to the Raspberry Pi on port 17872, the computer and RPi negotiate a secure, encrypted connection.
 ![Raspberry Pi Screenshot](rpiinterface)
 For the webcam module, it uses a wire strip to connect to the Raspberry Pi and it communicates using the PiCamera2 Python library as well as the libcamera module. By creating some basic Python code using PiCamera2, I was able to capture photos such as the one below:
-![PICamera Photo](picam.png)
+![PICamera Photo](picam.png) <br>
+<em>A photo taken with the PI Camera.</em>
+
 I also made my own case for the RPi's Webcam and 3D printed it to ensure easy mounting later on. 
 
 ### Challenges:
@@ -102,7 +106,9 @@ JitterBug PCB, Coin Cell Battery, Red LEDs, ERM Vibration Motor, Slide Switch, T
   The circuit is powered by the small coin cell battery in the center. It conducts electricity into a metal battery holder, which powers the vibration motor and LED. A switch in the middle of the jitterbug allows current through the circuit if turned on. There are also some metal wires that act as legs for the jitterbug. 
 
 #### Circuit Diagram:
-![Jitterbug Diagram](JitterbugCircuitDiagram.png)
+![Jitterbug Diagram](JitterbugCircuitDiagram.png) <br>
+<em>A circuit diagram of the Jitterbug; sourced from the OnShape page for the Jitterbug.</em>
+
   Shown above is the circuit diagram for this starter project. As illustrated, there is a series of parallel connections all powered by the cell battery. 
 
 ### Challenges:
