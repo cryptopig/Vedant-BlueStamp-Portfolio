@@ -207,16 +207,19 @@ VSCode, Tiger VNCViewer, VSCode (SSH), RPi OS (Linux)
 #### Challenges:
   Throughout this process, I faced lots of difficult challenges, mostly with getting the OpenCV pipeline to work correctly and tuning the bot's movement. The first problem I faced was with running multiple loops at the same time; in order to increase efficiency, I wanted to run a loop for motor control and OpenCV at the same time; however, the async library that I was using was too slow and caused delays. I switched to another implementation:
 
-`if __name__ == '__main__':
+```python
+if __name__ == '__main__':
     t1 = threading.Thread(target=camera_loop)
     t1.daemon = True
     t1.start()
    t2 = threading.Thread(target=control_loop)
     t2.daemon = True
-    t2.start()`
+    t2.start()
+```
 With this implentation, I could use multithreading to run multiple while loops at the same time with Daemon instead, which is built into Python and worked much better. However, the loop was still too slow. I decided to look into adjusting the FPS; I intentionally delayed the loop by 0.024 seconds, which translated to 24 FPS; a number based on tons of trial-and-error tuning. I also used a Gaussian blur and mask in order to erode the quality of the image and make the model faster. My other main challenge was that the bot was overturning; wen it detected that the ball was off-centered, it would turn left or right. However, it would turn so quickly that the ball would leave the frame, and it would get stuck in a loop of turning in circles. To fix this, I implemented motor PWM control to properly control motor speed:
 
-`def init():
+```python
+def init():
     global left_pwm, right_pwm
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
@@ -229,7 +232,8 @@ With this implentation, I could use multithreading to run multiple while loops a
     right_pwm.value = 1.0
 def set_speed(left=1.0, right=1.0):
     left_pwm.value = left
-    right_pwm.value = right`
+    right_pwm.value = right
+```
     
 This process was a bit challenging to figure out, as I hadn't used motor PWM directly before this point. However, this solution worked and the bot turned much slower, and it could efficently track the ball. 
 
