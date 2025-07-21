@@ -189,7 +189,7 @@ def set_servo(position="half"):
 ##### Hardware and Cable Management
   One of the most time-consuming and often overlooked parts of this project was the wire management and hardware design to organize the robot. In my intial build, the wiring was a tangled mess, which caused constant electrical issues and unintended shorts. Wires would also come loose very easily or snag on a wheel, which made debugging very tedious. To address this, I rewired the entire system when mounting it on the tank chassis, and custom cadded wire guides and platforms for every part. I also labelled the wires to make debugging much faster. Motor wires were directly soldered on, and I used wire wraps and tape to group together my wires so they wouldn't tangle. By the end of this overhaul, the robot looked cleaner and also was significantly easier to troubleshoot. I could eliminate random shorts and greatly reduced the risk of disconnects.
 
-  
+ 
 
 
 # Milestone 3
