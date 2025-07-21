@@ -33,44 +33,44 @@ class ServoPositions():
     CLOSE = 55
     HALF = 30
     OPEN = 15
-    TOP = 20
-    BOTTOM = 60
+    TOP = 30
+    BOTTOM = 120
 
 # main function to set position
 def set_servo(position="half"):
     if (position == "close"):
-        set_angle(ServoPositions.CLOSE)
+        set_angle(ServoPositions.CLOSE, "claw")
     elif (position == "complete_open"):
-        set_angle(ServoPositions.OPEN)
+        set_angle(ServoPositions.OPEN, "claw")
     elif (position == "half"):
-        set_angle(ServoPositions.HALF)
+        set_angle(ServoPositions.HALF, "claw")
     elif (position == "top"):
         set_angle(ServoPositions.TOP, "wrist")
     else:
         set_angle(ServoPositions.BOTTOM, "wrist")
 
 # test code for tuning/testing the servos
-try:  
-    while True:
-        motor = input("Enter motor (claw or wrist): ")
-        pos = input("Enter desired position (open, close, half; ): ")
+# try:  
+#     while True:
+#         motor = input("Enter motor (claw or wrist): ")
+#         pos = input("Enter desired position (open, close, half; ): ")
         
-        # claw code
-        if (motor == "claw:"):
-            if(pos == "open" ):
-                set_servo("complete_open")
-            elif (pos == "half"):
-                set_servo("half")
-            else:
-                set_servo("close")
+#         # claw code
+#         if (motor == "claw"):
+#             if(pos == "open" ):
+#                 set_servo("complete_open")
+#             elif (pos == "half"):
+#                 set_servo("half")
+#             else:
+#                 set_servo("close")
 
-        # wrist code
-        else:
-            if (pos == "top"):
-                set_servo("top")
-            else:
-                set_servo("bottom")
+#         # wrist code
+#         else:
+#             if (pos == "top"):
+#                 set_servo("top")
+#             else:
+#                 set_servo("bottom")
 
-except KeyboardInterrupt:
-    GPIO.cleanup()
-    exit()
+# except KeyboardInterrupt:
+#     GPIO.cleanup()
+#     exit()
