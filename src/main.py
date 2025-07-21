@@ -1,63 +1,61 @@
 from flask import Flask, Response
-import RPi.GPIO as GPIO
 from gpiozero import DistanceSensor
 from picamera2 import Picamera2
 import cv2
 import numpy as np
 import threading
 import time
-from motorcode import move_forward, turn_left, turn_right, stop, init, set_speed
+
+from motorcode import move_forward, turn_left, turn_right, stop
+print("end of imports")
 
 app = Flask(__name__)
-sensor = DistanceSensor(echo=26, trigger=19)
+# sensor = DistanceSensor(echo=26, trigger=19)
 
-FPS = 24  # frames per second
+FPS = 10  # Optimized for Raspberry Pi performance
+CAMERA_OFFSET = 0  # Camera alignment offset
 
-# tuned this value; the camera is offset to the right of the bot, so I needed to correct
-# for this offset in code. Tuned this value based on trial-and-error.
-CAMERA_OFFSET = 140
-
-init()
+x_y = 3
 # Initialize camera
 picam2 = Picamera2()
-video_config = picam2.create_video_configuration(main={"size": (640, 480), "format": "RGB888"})
+video_config = picam2.create_video_configuration(main={"size": (320, 240), "format": "RGB888"})
+print("video initialized")
 picam2.configure(video_config)
 picam2.start()
 time.sleep(1)
 
 output_frame = None
 frame_lock = threading.Lock()
-# motor pins are already specified in imported functions; don't need to be used directly here
 
-# main detection function
-import cv2
-
+# Load MobileNetSSD model
 net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt', 'MobileNetSSD_deploy.caffemodel')
-# imports some arbitrar objects from the predownloaded model 
+print("model loaded")
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_DEFAULT)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
 classes = ["background", "aeroplane", "bicycle", "bird", "boat",
            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
            "dog", "horse", "motorbike", "person", "pottedplant",
            "sheep", "sofa", "train", "tvmonitor"]
 
-trash_classes = {"bottle"}  # You can expand this as needed
+trash_classes = {"bottle"}
 detected_trash_center = [0, 0]
+print("model initialized")
 
-# main deetction function
+
 def detect_trash(frame):
     global detected_trash_center
     h, w = frame.shape[:2]
-    
-    # small resolution to increase performance (probably will run ~8 FPS)
-    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
-                                 0.007843, (300, 300), 127.5)
+
+    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 0.007843, (300, 300), 127.5)
     net.setInput(blob)
     detections = net.forward()
 
-    detected_trash_center = [0, 0]  # Reset every frame
+    detected_trash_center = [0, 0]
 
     for i in range(detections.shape[2]):
         confidence = detections[0, 0, i, 2]
-        if confidence > 0.5:
+        if confidence > 0.3:
             idx = int(detections[0, 0, i, 1])
             label = classes[idx]
             if label in trash_classes:
@@ -71,90 +69,78 @@ def detect_trash(frame):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
                 detected_trash_center = [centerX, centerY]
-                break  # Only track the first detected trash item
+                break
 
     return frame
 
 
-# main camera loop; cycles through frames specified by FPS variable and detects whether the
-# red ball is in frame
 def camera_loop():
     global output_frame
+    frame_count = 0
     while True:
         frame = picam2.capture_array()
         frame = cv2.rotate(frame, cv2.ROTATE_180)
-        frame = detect_trash(frame)
+
+        if frame_count % 2 == 0:  # Process every other frame
+            frame = detect_trash(frame)
 
         with frame_lock:
             output_frame = frame
-                        
 
+        frame_count += 1
         time.sleep(1.0 / FPS)
 
+
 def control_loop():
+    last_detected = False
     try:
-        init()
         while True:
-            track_center()
-            
+            if detected_trash_center[0] != 0:
+                if not last_detected:
+                    print("✅ Trash detected.", flush=True)
+                    last_detected = True
+                track_center()
+            else:
+                if last_detected:
+                    print("❌ Trash not detected.", flush=True)
+                    last_detected = False
+            time.sleep(1.0 / FPS)
     except KeyboardInterrupt:
-        stop()
-    
-# determine center 
-# turn left/right until the bounding box is in the center of the screen
-# move forwards when the ball is in the center of the screen
-# stop based on ultrasonic sensor distance
+        pass
 
-# all movement functios are imported from motorcode so they don't need to be specified
-def track_center(frame_width=640, threshold=50, distance = 0.075):
+
+def track_center(frame_width=320, threshold=30, distance=0.075):
     global detected_trash_center
-    set_speed(0.65,0.65)
-
-
-    if detected_trash_center[0] == 0:
-        print("Ball not detected.")
-        stop()
-        return
 
     frame_center = (frame_width // 2) - CAMERA_OFFSET
     delta = detected_trash_center[0] - frame_center
 
-    # print(f"Ball X: {ball_pos[0]}, Center: {frame_center}, Delta: {delta}")
+    # if x_y < distance:
+    #     print(f'🛑 Bot is too close: distance is {x_y:.3f} m', flush=True)
+    #     time.sleep(1)
+    #     return
 
-    # stop condition
-    if (sensor.distance < distance):
-        print(f'Bot is too close: distance is {sensor.distance}')
-        stop()
-        exit()
-
-    # forward
     if abs(delta) <= threshold:
         move_forward()
-        print(f"Ball X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; FORWARD\nDistance: {sensor.distance}")
-
-    # left turn
+        print(f"⬆️  Moving forward — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {x_y:.3f} m", flush=True)
     elif delta < -threshold:
         turn_left()
-        print(f"Ball X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; LEFT\nDistance: {sensor.distance}")
-        
-    
-    # right turn
+        print(f"⬅  Turning left — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {x_y:.3f} m", flush=True)
     elif delta > threshold:
         turn_right()
-        print(f"Ball X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; RIGHT\nDistance: {sensor.distance}")
+        print(f"➡️> Turning right — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {x_y:.3f} m", flush=True)
 
 @app.route('/')
 def video_feed():
     def generate():
         last_frame_time = time.time()
-
         while True:
             with frame_lock:
                 if output_frame is None:
                     continue
                 current_time = time.time()
                 if current_time - last_frame_time < (1.0 / FPS):
-                    continue  # skip if too soon
+                    continue
                 last_frame_time = current_time
 
                 ret, buffer = cv2.imencode('.jpg', output_frame)
@@ -167,7 +153,6 @@ def video_feed():
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-# host on web server to easily see what the cam. is actually detecting; for debugging purposes
 if __name__ == '__main__':
     t1 = threading.Thread(target=camera_loop)
     t1.daemon = True
@@ -178,3 +163,4 @@ if __name__ == '__main__':
     t2.start()
 
     app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False, threaded=True)
+    print("server started")
