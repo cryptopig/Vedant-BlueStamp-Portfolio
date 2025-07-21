@@ -7,10 +7,34 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
 | Vedant G. | Adrian C. Wilcox High School | Mechanical Engineering/Robotics | Incoming Senior
 
 <img src="VedantG.png" alt="Profile Picture" width="300" height="400">
+
+# Modifications:
+  The modifications were definitely took the most time, but it was very rewarding. I completely switched the drivetrain, OpenCV model, and rehauled the hardware and wiring to make the bot look much cleaner. 
+
+###### Chassis and Drivetrain:
+  I started with a base tank chassis and assembled it from scratch, ensuring that I labelled all motors and motor wires (which made the programming process much easier later). I chose a tank chassis because in the real world, it would have real applications since the bot would need to cross rough terrain on roads. This chassis was also much sturdier, as it featured an aluminum frame. It also looked much cooler than the plastic chassis. This chassis actually inspired another student who was doing the ball-tracking robot to switch over to the tank tracks as well.
+
+##### OpenCV Pipeline Rework:
+  One of the main modifications of this part of my project was getting the model to detect pieces of trash instead of the bright red ball. This required a complete overhaul of the OpenCV model. Instead of applying a color mask and eroding an image, I used MobileSSD's model trained on a variety of different objects to recognize and detect plastic bottles and other pieces of trash. Even though MobileNetSSD isn’t perfect for close-range detection, it gave me a much better baseline for consistent results in varying lighting and angles. 
+  Furthermore, I also modified the distance sensing. My goal with this overhaul was also to simplify my project as much as I could, so I found a way to remove the ultrasonic sensor by detecting distance based on focal length and an object's pixel distance from the camera. This meant that there was no need for a voltage divider circuit, and it removed lots of wiring clutter and power load on the batteries/Pi.
+  The model also drew dynamic bounding boxes around pieces of trash, which helped me later on with programming, as I could reference (x,y) coordinates on these bounding boxes to perform operations such as distance calculations and automatic claw control.
+
+##### Claw Subsystem
+  One of my favorite modifications to this project was adding on the claw to pick up the pieces of trash and move them around. I reiterated the design for the claw. Originally, it included three different servos. However, this would have been too much power draw and the connetions started to come loose. I simplified this to a design that only required two servos, and the claw could rotate on two differenta axes to pick up bottles and pieces of trash on many different orientations. 
+  Writing the code for the claw was definitely difficult, as I had to fine-tune the servo values for the claw and ensure it worked every time. I did not have any encoders on the servos, which made it more difficult. I used pulse-width modulation (PWM) to avoid jitter and misaligntment. After several rounds of trial and error, I calibrated the servo's open, half-open, and closed positions based on durty cycle percentages. I also tuned the second servo, which acteda s a sort of wrist for the claw. I also introduced a contro llogic system that prevented redundant commands. For example, once the claw closed on a detected object, I locked the servo in place and restricted the program from sending repeated "close" signals, which would otherwise cause unecessary strain and power consumption. 
+  Mechanically, mounting the claw presented its own challenges. I had to ensure that the servo housing was rigidly secured to the chassis, yet isolated enough to avoid absorbing vibrations from the motors. I also accounted for wire routing, giving the servo cable enough slack to move with the gripper arm without tugging on the connection point.
+
+
+##### Hardware and Cable Management
+  One of the most time-consuming and often overlooked parts of this project was the wire management and hardware design to organize the robot. In my intial build, the wiring was a tangled mess, which caused constant electrical issues and unintended shorts. Wires would also come loose very easily or snag on a wheel, which made debugging very tedious. To address this, I rewired the entire system when mounting it on the tank chassis, and custom cadded wire guides and platforms for every part. I also labelled the wires to make debugging much faster. Motor wires were directly soldered on, and I used wire wraps and tape to group together my wires so they wouldn't tangle. By the end of this overhaul, the robot looked cleaner and also was significantly easier to troubleshoot. I could eliminate random shorts and greatly reduced the risk of disconnects.
+
+  
+
+
 # Milestone 3
 <iframe width="966" height="543" src="https://www.youtube.com/embed/zQjKnPrG0UA?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-My third milestone was probably the most challenging up to this point; it was to finish the actual software for the bot and get it to track the ball on-screen with OpenCV and translate that into actual movement on the bot. However, I was motivated to finish since I was looking forward to working on my modifications, which are the bulk of my project. Since I had some previous experience with OpenCV and already had some boilerplate code from Milestone 2, it made the process a bit easier. However, I had to fine-tunbe tons of different variables and optimize many features to get the bot to track the ball real-time instead of slightly delayed. I also had some debugging to do for the motor wiring (since I did not label my motor wires); for the future moving of all the parts to the tank chassis, I will ensure that I label and organize my wires to expedite this process. 
+  My third milestone was probably the most challenging up to this point; it was to finish the actual software for the bot and get it to track the ball on-screen with OpenCV and translate that into actual movement on the bot. However, I was motivated to finish since I was looking forward to working on my modifications, which are the bulk of my project. Since I had some previous experience with OpenCV and already had some boilerplate code from Milestone 2, it made the process a bit easier. However, I had to fine-tunbe tons of different variables and optimize many features to get the bot to track the ball real-time instead of slightly delayed. I also had some debugging to do for the motor wiring (since I did not label my motor wires); for the future moving of all the parts to the tank chassis, I will ensure that I label and organize my wires to expedite this process. 
 
 #### Software/Tools Used:
 VSCode, Tiger VNCViewer, VSCode (SSH), RPi OS (Linux)
