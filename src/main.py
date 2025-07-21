@@ -5,8 +5,10 @@ import cv2
 import numpy as np
 import threading
 import time
+import RPi.GPIO as GPIO
 
-from motorcode import move_forward, turn_left, turn_right, stop
+from motorcode import robot, left_motor, right_motor
+from servo_code import set_servo
 print("end of imports")
 
 app = Flask(__name__)
@@ -15,8 +17,24 @@ app = Flask(__name__)
 FPS = 10  # Optimized for Raspberry Pi performance
 CAMERA_OFFSET = 0  # Camera alignment offset
 
-x_y = 3
+# function for approximating distance based on width of bottle
+REAL_OBJECT_WIDTH_CM = 7.0  # real-world width of bottle; assumes that the bottle is ~7 cm. in width
+FOCAL_LENGTH = 238  # tuned based on formula: (percieved pixel width * known cm. distance away from camera) / real cm. width
 # Initialize camera
+
+SPEED = 1.0 # from 0.0 to 1.0
+
+servo_pos = "open" # keeps track of servo position
+
+ENA = 3
+ENB = 13
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup([ENA, ENB], GPIO.OUT)
+GPIO.output(ENA, GPIO.HIGH)
+GPIO.output(ENB, GPIO.HIGH)
+print("motors initialized")
+
 picam2 = Picamera2()
 video_config = picam2.create_video_configuration(main={"size": (320, 240), "format": "RGB888"})
 print("video initialized")
@@ -43,15 +61,19 @@ detected_trash_center = [0, 0]
 print("model initialized")
 
 
+
+set_servo("half")
 def detect_trash(frame):
-    global detected_trash_center
+    global detected_trash_center, estimated_distance_cm
+
     h, w = frame.shape[:2]
 
-    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 0.007843, (300, 300), 127.5)
+    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (400, 400)), 0.007843, (400, 400), 127.5)
     net.setInput(blob)
     detections = net.forward()
 
     detected_trash_center = [0, 0]
+    estimated_distance_cm = float('inf')
 
     for i in range(detections.shape[2]):
         confidence = detections[0, 0, i, 2]
@@ -64,14 +86,25 @@ def detect_trash(frame):
                 centerX = (startX + endX) // 2
                 centerY = (startY + endY) // 2
 
+                box_width = endX - startX  # width in pixels based on bounding box
+
+                # distance estimation (focal length has to be calibrated)
+                if box_width > 0:
+                    estimated_distance_cm = (REAL_OBJECT_WIDTH_CM * FOCAL_LENGTH) / box_width
+
+                detected_trash_center = [centerX, centerY]
+
+                # annotate Frame
                 cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
                 cv2.putText(frame, f"{label}: {confidence:.2f}", (startX, startY - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(frame, f"Dist: {estimated_distance_cm:.1f} cm", (centerX, centerY),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-                detected_trash_center = [centerX, centerY]
-                break
+                break  # only process first detected object
 
     return frame
+
 
 
 def camera_loop():
@@ -81,7 +114,7 @@ def camera_loop():
         frame = picam2.capture_array()
         frame = cv2.rotate(frame, cv2.ROTATE_180)
 
-        if frame_count % 2 == 0:  # Process every other frame
+        if frame_count % 2 == 0:  # process every other frame
             frame = detect_trash(frame)
 
         with frame_lock:
@@ -109,26 +142,41 @@ def control_loop():
         pass
 
 
-def track_center(frame_width=320, threshold=30, distance=0.075):
-    global detected_trash_center
+# main function to track the center of the object; actually moves the bot to track the bottle
+def track_center(frame_width=320, threshold=70):
+    global detected_trash_center, estimated_distance_cm, servo_pos
 
     frame_center = (frame_width // 2) - CAMERA_OFFSET
     delta = detected_trash_center[0] - frame_center
 
-    # if x_y < distance:
-    #     print(f'🛑 Bot is too close: distance is {x_y:.3f} m', flush=True)
-    #     time.sleep(1)
-    #     return
+    if  estimated_distance_cm <= 11:
+        print(f'🛑 Bot is too close: distance is {estimated_distance_cm} cm', flush=True)
+        robot.stop()
+        if (servo_pos != "close"):
+            set_servo("close")
+            servo_pos="close" # makes sure the claw only closes once, so it doesn't try to close repeatedly
+        return
 
     if abs(delta) <= threshold:
-        move_forward()
-        print(f"⬆️  Moving forward — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {x_y:.3f} m", flush=True)
+        robot.forward(SPEED)
+        if (servo_pos != "open"):
+            set_servo("open")
+            servo_pos = "open"
+        time.sleep(0.5)
+        robot.stop()
+        print(f"⬆️  Moving forward — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {estimated_distance_cm:.3f} cm", flush=True)
+
     elif delta < -threshold:
-        turn_left()
-        print(f"⬅  Turning left — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {x_y:.3f} m", flush=True)
+        robot.left(SPEED)
+        time.sleep(0.3)
+        robot.stop()
+        print(f"⬅  Turning left — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {estimated_distance_cm:.3f} cm", flush=True)
+
     elif delta > threshold:
-        turn_right()
-        print(f"➡️> Turning right — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {x_y:.3f} m", flush=True)
+        robot.right(SPEED)
+        time.sleep(0.3)
+        robot.stop()
+        print(f"➡️> Turning right — Trash X: {detected_trash_center[0]}, Center: {frame_center}, Delta: {delta}; Distance: {estimated_distance_cm:.3f} cm", flush=True)
 
 @app.route('/')
 def video_feed():
@@ -162,5 +210,6 @@ if __name__ == '__main__':
     t2.daemon = True
     t2.start()
 
+    # live video feed server hosted on RPi
     app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False, threaded=True)
     print("server started")
