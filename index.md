@@ -19,10 +19,171 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
   Furthermore, I also modified the distance sensing. My goal with this overhaul was also to simplify my project as much as I could, so I found a way to remove the ultrasonic sensor by detecting distance based on focal length and an object's pixel distance from the camera. This meant that there was no need for a voltage divider circuit, and it removed lots of wiring clutter and power load on the batteries/Pi.
   The model also drew dynamic bounding boxes around pieces of trash, which helped me later on with programming, as I could reference (x,y) coordinates on these bounding boxes to perform operations such as distance calculations and automatic claw control.
 
+```python
+picam2 = Picamera2()
+video_config = picam2.create_video_configuration(main={"size": (320, 240), "format": "RGB888"})
+print("video initialized")
+picam2.configure(video_config)
+picam2.start()
+time.sleep(1)
+
+output_frame = None
+frame_lock = threading.Lock()
+
+# Load MobileNetSSD model
+net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt', 'MobileNetSSD_deploy.caffemodel')
+print("model loaded")
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_DEFAULT)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
+classes = ["background", "aeroplane", "bicycle", "bird", "boat",
+           "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+           "dog", "horse", "motorbike", "person", "pottedplant",
+           "sheep", "sofa", "train", "tvmonitor"]
+
+trash_classes = {"bottle"}
+detected_trash_center = [0, 0]
+print("model initialized")
+
+
+
+set_servo("half")
+def detect_trash(frame):
+    global detected_trash_center, estimated_distance_cm
+
+    h, w = frame.shape[:2]
+
+    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (400, 400)), 0.007843, (400, 400), 127.5)
+    net.setInput(blob)
+    detections = net.forward()
+
+    detected_trash_center = [0, 0]
+    estimated_distance_cm = float('inf')
+
+    for i in range(detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+        if confidence > 0.3:
+            idx = int(detections[0, 0, i, 1])
+            label = classes[idx]
+            if label in trash_classes:
+                box = detections[0, 0, i, 3:7] * [w, h, w, h]
+                (startX, startY, endX, endY) = box.astype("int")
+                centerX = (startX + endX) // 2
+                centerY = (startY + endY) // 2
+
+                box_width = endX - startX  # width in pixels based on bounding box
+
+                # distance estimation (focal length has to be calibrated)
+                if box_width > 0:
+                    estimated_distance_cm = (REAL_OBJECT_WIDTH_CM * FOCAL_LENGTH) / box_width
+
+                detected_trash_center = [centerX, centerY]
+
+                # annotate Frame
+                cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+                cv2.putText(frame, f"{label}: {confidence:.2f}", (startX, startY - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(frame, f"Dist: {estimated_distance_cm:.1f} cm", (centerX, centerY),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+                break  # only process first detected object
+
+    return frame
+
+
+
+def camera_loop():
+    global output_frame
+    frame_count = 0
+    while True:
+        frame = picam2.capture_array()
+        frame = cv2.rotate(frame, cv2.ROTATE_180)
+
+        if frame_count % 2 == 0:  # process every other frame
+            frame = detect_trash(frame)
+
+        with frame_lock:
+            output_frame = frame
+
+        frame_count += 1
+        time.sleep(1.0 / FPS)
+
+
+def control_loop():
+    last_detected = False
+    try:
+        while True:
+            if detected_trash_center[0] != 0:
+                if not last_detected:
+                    print("✅ Trash detected.", flush=True)
+                    last_detected = True
+                track_center()
+            else:
+                if last_detected:
+                    print("❌ Trash not detected.", flush=True)
+                    last_detected = False
+            time.sleep(1.0 / FPS)
+    except KeyboardInterrupt:
+        pass
+```
+
 ##### Claw Subsystem
   One of my favorite modifications to this project was adding on the claw to pick up the pieces of trash and move them around. I reiterated the design for the claw. Originally, it included three different servos. However, this would have been too much power draw and the connetions started to come loose. I simplified this to a design that only required two servos, and the claw could rotate on two differenta axes to pick up bottles and pieces of trash on many different orientations. 
   Writing the code for the claw was definitely difficult, as I had to fine-tune the servo values for the claw and ensure it worked every time. I did not have any encoders on the servos, which made it more difficult. I used pulse-width modulation (PWM) to avoid jitter and misaligntment. After several rounds of trial and error, I calibrated the servo's open, half-open, and closed positions based on durty cycle percentages. I also tuned the second servo, which acteda s a sort of wrist for the claw. I also introduced a contro llogic system that prevented redundant commands. For example, once the claw closed on a detected object, I locked the servo in place and restricted the program from sending repeated "close" signals, which would otherwise cause unecessary strain and power consumption. 
   Mechanically, mounting the claw presented its own challenges. I had to ensure that the servo housing was rigidly secured to the chassis, yet isolated enough to avoid absorbing vibrations from the motors. I also accounted for wire routing, giving the servo cable enough slack to move with the gripper arm without tugging on the connection point.
+
+```python
+import RPi.GPIO as GPIO
+from time import sleep
+
+claw = 14
+wrist = 18
+OFFSET = 2.5
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(claw, GPIO.OUT)
+GPIO.setup(wrist, GPIO.OUT)
+
+claw_pwm = GPIO.PWM(claw, 50)  # 50Hz PWM frequency
+claw_pwm.start(0)
+
+wrist_pwm = GPIO.PWM(wrist, 50)
+wrist_pwm.start(0)
+
+
+def set_angle(angle, servo="claw"):
+    duty = angle / 18 + OFFSET  # maps 0–180 degrees to ~2.5%–12.5% duty cycle
+    if (servo=="claw"):
+        claw_pwm.ChangeDutyCycle(duty)
+        sleep(1)
+        claw_pwm.ChangeDutyCycle(0)
+    else:
+        wrist_pwm.ChangeDutyCycle(duty)
+        sleep(1)
+        wrist_pwm.ChangeDutyCycle(0)
+      # prevent servo jitter
+
+# kind of an enum; makes it easier to map servo positions to numbers for tuning
+# values based on trial and error
+class ServoPositions():
+    CLOSE = 55
+    HALF = 30
+    OPEN = 15
+    TOP = 30
+    BOTTOM = 120
+
+# main function to set position
+def set_servo(position="half"):
+    if (position == "close"):
+        set_angle(ServoPositions.CLOSE, "claw")
+    elif (position == "complete_open"):
+        set_angle(ServoPositions.OPEN, "claw")
+    elif (position == "half"):
+        set_angle(ServoPositions.HALF, "claw")
+    elif (position == "top"):
+        set_angle(ServoPositions.TOP, "wrist")
+    else:
+        set_angle(ServoPositions.BOTTOM, "wrist")
+```
 
 
 ##### Hardware and Cable Management
