@@ -281,6 +281,13 @@ I also made my own case for the RPi's Webcam and 3D printed it to ensure easy mo
 ### Challenges:
   The main challenge with the setup process for the Raspberry Pi setup was setting up the network connections and ensuring SSH/VNC worked well. The initial set-up of a new wi-fi connection is a bit tedious, especially on a headless setup where I need to use OBS to create a new video capture device and view the Raspberry Pi from there, as well as control it with external peripherals. However, tools like TigerVNC Viewer made this process much easier after the intial connection to wi-fi, as I could simply use my built-in mouse and keyboard and view the Raspberry Pi on my laptop itself. SSH was a bit challenging to set up with VSCode initially, but the VS Code extensions made it much simpler to interface with.
 
+# LibberBot Bill of Materials
+
+| **Part** | **Note** | **Price** | **Link** |
+|:--:|:--:|:--:|:--:|
+| Raspberry Pi 4 | Main microcontroller that powers the project | $63 | <a href="[Link to the Raspberry Pi 4](https://www.amazon.com/Raspberry-Model-2019-Quad-Bluetooth/dp/B07TC2BK1X)"> Link </a> |
+| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
+| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
 
 <!-- ##################################################################################### -->
 
@@ -305,6 +312,7 @@ JitterBug PCB, Coin Cell Battery, Red LEDs, ERM Vibration Motor, Slide Switch, T
 
 ### What I learned:
   By viewing and analyzing the circuit diagram, I learned abouut circuit analysis and diagramming. This project was also a great refresher on soldering techniques and safety.
+
 
 <!--
 ![Headstone Image](logo.svg)
@@ -369,12 +377,6 @@ void loop() {
 # Bill of Materials
 Here's where you'll list the parts in your project. To add more rows, just copy and paste the example rows below.
 Don't forget to place the link of where to buy each component inside the quotation marks in the corresponding row after href =. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize this to your project needs. 
-
-| **Part** | **Note** | **Price** | **Link** |
-|:--:|:--:|:--:|:--:|
-| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
 
 # Other Resources/Examples
 One of the best parts about Github is that you can view how other people set up their own work. Here are some past BSE portfolios that are awesome examples. You can view how they set up their portfolio, and you can view their index.md files to understand how they implemented different portfolio components.
