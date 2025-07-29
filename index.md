@@ -19,7 +19,7 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
   Furthermore, I also modified the distance sensing. My goal with this overhaul was also to simplify my project as much as I could, so I found a way to remove the ultrasonic sensor by detecting distance based on focal length and an object's pixel distance from the camera. This meant that there was no need for a voltage divider circuit, and it removed lots of wiring clutter and power load on the batteries/Pi.
   The model also drew dynamic bounding boxes around pieces of trash, which helped me later on with programming, as I could reference (x,y) coordinates on these bounding boxes to perform operations such as distance calculations and automatic claw control.
   
-<img src="./media/IMG_3025.png" alt="OpenCV" jeight="400px">
+<img src="./media/IMG_3025.png" alt="OpenCV" height="400px">
 ```python
 picam2 = Picamera2()
 video_config = picam2.create_video_configuration(main={"size": (320, 240), "format": "RGB888"})
