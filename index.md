@@ -19,7 +19,8 @@ Hello! I'm Vedant from Adrian C. Wilcox High School. My projet is a litter clean
   Furthermore, I also modified the distance sensing. My goal with this overhaul was also to simplify my project as much as I could, so I found a way to remove the ultrasonic sensor by detecting distance based on focal length and an object's pixel distance from the camera. This meant that there was no need for a voltage divider circuit, and it removed lots of wiring clutter and power load on the batteries/Pi.
   The model also drew dynamic bounding boxes around pieces of trash, which helped me later on with programming, as I could reference (x,y) coordinates on these bounding boxes to perform operations such as distance calculations and automatic claw control.
   
-<img src="./media/IMG_3025.png" alt="OpenCV" height="400px">
+<img src="./media/IMG_3025.png" alt="OpenCV" height="400px"> <br>
+<em>Initial OpenCV code; the bounding box is being drawn around a small plastic bag. This code was made before the actual tank chassis was completed. </em>
 ```python
 picam2 = Picamera2()
 video_config = picam2.create_video_configuration(main={"size": (320, 240), "format": "RGB888"})
@@ -192,7 +193,7 @@ def set_servo(position="half"):
 
  
 <img src="./media/IMG_3055.png" alt="Tank Treads" height=400px> <br>
-<em>An image of the OpenCV model working in real-time. The size of the circle adjusts to the size of the red ball.</em>
+<em>The tank tread chassis in progress.</em>
 
 # Milestone 3
 <iframe width="966" height="543" src="https://www.youtube.com/embed/zQjKnPrG0UA?list=PLe-u_DjFx7eui8dmPGji-0-slT8KydYv_" title="Vedant G. Milestone 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
