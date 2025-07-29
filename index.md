@@ -190,7 +190,7 @@ def set_servo(position="half"):
   One of the most time-consuming and often overlooked parts of this project was the wire management and hardware design to organize the robot. In my intial build, the wiring was a tangled mess, which caused constant electrical issues and unintended shorts. Wires would also come loose very easily or snag on a wheel, which made debugging very tedious. To address this, I rewired the entire system when mounting it on the tank chassis, and custom cadded wire guides and platforms for every part. I also labelled the wires to make debugging much faster. Motor wires were directly soldered on, and I used wire wraps and tape to group together my wires so they wouldn't tangle. By the end of this overhaul, the robot looked cleaner and also was significantly easier to troubleshoot. I could eliminate random shorts and greatly reduced the risk of disconnects.
 
  
-![Tank Treads](./media/IMG_3055.png) <br>
+<img src="./media/IMG_3055.png" alt="Tank Treads" height=40%> <br>
 <em>An image of the OpenCV model working in real-time. The size of the circle adjusts to the size of the red ball.</em>
 
 # Milestone 3
